@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Главная{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Добро пожаловать в Менеджер задач</h2>
+    <p>Это главная страница вашей системы управления задачами.</p>
+    <div class="links">
+        <a href="/login" class="btn btn-primary">Вход</a>
+        <a href="/register" class="btn btn-secondary">Регистрация</a>
+        <a href="/tasks" class="btn btn-success">Просмотр задач</a>
+    </div>
+</div>
+{% endblock %}

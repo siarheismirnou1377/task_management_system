@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Создать задачу{% endblock %}
+
+{% block content %}
+<h2>Создать задачу</h2>
+<form action="/tasks/create" method="post">
+    <label for="title">Заголовок:</label>
+    <input type="text" id="title" name="title" required>
+    <br>
+    <label for="description">Описание:</label>
+    <textarea id="description" name="description" required></textarea>
+    <br>
+    <label for="status">Статус:</label>
+    <select id="status" name="status">
+        <option value="новая">Новая</option>
+        <option value="в процессе">В процессе</option>
+        <option value="завершена">Завершена</option>
+    </select>
+    <br>
+    <label for="priority">Приоритет:</label>
+    <select id="priority" name="priority">
+        <option value="низкий">Низкий</option>
+        <option value="средний">Средний</option>
+        <option value="высокий">Высокий</option>
+    </select>
+    <br>
+    <label for="deadline">Крайний срок:</label>
+    <input type="datetime-local" id="deadline" name="deadline">
+    <br>
+    <button type="submit">Создать задачу</button>
+</form>
+{% endblock %}
