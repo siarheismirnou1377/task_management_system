@@ -3,7 +3,7 @@
 {% block title %}Задача{% endblock %}
 
 {% block content %}
-<div class="container">
+
     {% if not current_user %}
     <p>Чтобы посмотреть задачу, <a href="/login">войдите</a> или <a href="/register">зарегестрируйтесь</a></p>
     {% else %}
@@ -37,6 +37,6 @@
             </div>
         </div>
     {% endif %}
-</div>
+
 <script src="{{ url_for('static', path='/scripts.js') }}"></script>
 {% endblock %}
