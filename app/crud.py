@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import secrets
 from sqlalchemy.orm import Session
 from . import models, schemas
@@ -38,7 +38,7 @@ def delete_task(db: Session, task_id: int):
 
 def create_session(db: Session, user_id: int) -> models.Session:
     session_token = secrets.token_hex(32)
-    expires_at = datetime.utcnow() + timedelta(days=7)  # Сессия действительна 7 дней
+    expires_at = datetime.now(timezone.utc) + timedelta(days=7)  # Сессия действительна 7 дней
     db_session = models.Session(user_id=user_id, session_token=session_token, expires_at=expires_at)
     db.add(db_session)
     db.commit()
@@ -51,3 +51,23 @@ def get_session(db: Session, session_token: str) -> models.Session:
 def delete_session(db: Session, session_token: str):
     db.query(models.Session).filter(models.Session.session_token == session_token).delete()
     db.commit()
+
+def task_to_dict(task: models.Task) -> dict:
+    return {
+        "id": task.id,
+        "title": task.title,
+        "description": task.description,
+        "status": task.status,
+        "priority": task.priority,
+        "deadline": task.deadline.isoformat() if task.deadline else None,
+        "owner_id": task.owner_id
+    }
+
+def get_tasks_with_near_deadline(db: Session, user_id: int):
+    one_day_from_now = datetime.now(timezone.utc) + timedelta(days=1)
+    tasks = db.query(models.Task).filter(
+        models.Task.owner_id == user_id,
+        models.Task.deadline <= one_day_from_now,
+        models.Task.deadline > datetime.now(timezone.utc)
+    ).all()
+    return [task_to_dict(task) for task in tasks]

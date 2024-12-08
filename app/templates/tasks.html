@@ -3,24 +3,47 @@
 {% block title %}Задачи{% endblock %}
 
 {% block content %}
-{% if not current_user %}
-<p>Чтобы посмотреть список задач, <a href="/login">войдите</a> или <a href="/register">зарегестрируйтесь</a></p>
-{% else %}
-<h2>Задачи</h2>
-<a href="/tasks/create">Создать новую задачу</a>
-<ul>
-    {% for task in tasks %}
-    <li>
-        <h3>{{ task.title }}</h3>
-        <p>{{ task.description }}</p>
-        <p>Статус: {{ task.status }}</p>
-        <p>Приоритет: {{ task.priority }}</p>
-        <a href="/tasks/{{ task.id }}/edit">Редактировать</a>
-        <form action="/tasks/{{ task.id }}/delete" method="post">
-            <button type="submit">Удалить</button>
-        </form>
-    </li>
-    {% endfor %}
-</ul>
-{% endif %}
+<div class="container">
+    {% if not current_user %}
+    <p>Чтобы посмотреть список задач, <a href="/login">войдите</a> или <a href="/register">зарегестрируйтесь</a></p>
+    {% else %}
+        <h2>Задачи</h2>
+        <a href="/tasks/create">Создать новую задачу</a>
+        <ul>
+            {% for task in tasks %}
+            <li>
+                <h3>{{ task.title }}</h3>
+                <p>{{ task.description }}</p>
+                <p>Статус: {{ task.status }}</p>
+                <p>Приоритет: {{ task.priority }}</p>
+                <p>Дедлайн: {{ task.deadline}}</p>
+                <a href="/tasks/{{ task.id }}/edit">Редактировать</a>
+                <form action="/tasks/{{ task.id }}/delete" method="post">
+                    <button type="submit">Удалить</button>
+                </form>
+            </li>
+            {% endfor %}
+        </ul>
+        <span id="near-deadline-tasks" style="display:none;">{{ near_deadline_tasks | tojson | safe }}</span>
+        <div class="modal fade" id="deadlineModal" tabindex="-1" role="dialog" aria-labelledby="deadlineModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deadlineModalLabel">Внимание!</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        Дедлайн для задачи <a id="taskLink" href="#">"<span id="taskTitle"></span>"</a> наступает <span id="taskDeadline"></span>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+<script src="{{ url_for('static', path='/scripts.js') }}"></script>
 {% endblock %}

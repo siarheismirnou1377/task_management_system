@@ -3,35 +3,57 @@
 {% block title %}Редактировать задачу{% endblock %}
 
 {% block content %}
-{% if not current_user %}
-<p>Чтобы редактировать задачи, <a href="/login">войдите</a> или <a href="/register">зарегестрируйтесь</a></p>
-{% else %}
-<h2>Редактировать задачу</h2>
-<form action="/tasks/{{ task.id }}/edit" method="post">
-    <label for="title">Заголовок:</label>
-    <input type="text" id="title" name="title" value="{{ task.title }}" required>
-    <br>
-    <label for="description">Описание:</label>
-    <textarea id="description" name="description" required>{{ task.description }}</textarea>
-    <br>
-    <label for="status">Статус:</label>
-    <select id="status" name="status">
-        <option value="новая" {% if task.status == "новая" %}selected{% endif %}>Новая</option>
-        <option value="в процессе" {% if task.status == "в процессе" %}selected{% endif %}>В процессе</option>
-        <option value="завершена" {% if task.status == "завершена" %}selected{% endif %}>Завершена</option>
-    </select>
-    <br>
-    <label for="priority">Приоритет:</label>
-    <select id="priority" name="priority">
-        <option value="низкий" {% if task.priority == "низкий" %}selected{% endif %}>Низкий</option>
-        <option value="средний" {% if task.priority == "средний" %}selected{% endif %}>Средний</option>
-        <option value="высокий" {% if task.priority == "высокий" %}selected{% endif %}>Высокий</option>
-    </select>
-    <br>
-    <label for="deadline">Крайний срок:</label>
-    <input type="datetime-local" id="deadline" name="deadline" value="{{ task.deadline.strftime('%Y-%m-%dT%H:%M') if task.deadline else '' }}">
-    <br>
-    <button type="submit">Обновить задачу</button>
-</form>
-{% endif %}
+<div class="container">
+    {% if not current_user %}
+    <p>Чтобы редактировать задачи, <a href="/login">войдите</a> или <a href="/register">зарегестрируйтесь</a></p>
+    {% else %}
+    <h2>Редактировать задачу</h2>
+    <form action="/tasks/{{ task.id }}/edit" method="post">
+        <label for="title">Заголовок:</label>
+        <input type="text" id="title" name="title" value="{{ task.title }}" required>
+        <br>
+        <label for="description">Описание:</label>
+        <textarea id="description" name="description" required>{{ task.description }}</textarea>
+        <br>
+        <label for="status">Статус:</label>
+        <select id="status" name="status">
+            <option value="новая" {% if task.status == "новая" %}selected{% endif %}>Новая</option>
+            <option value="в процессе" {% if task.status == "в процессе" %}selected{% endif %}>В процессе</option>
+            <option value="завершена" {% if task.status == "завершена" %}selected{% endif %}>Завершена</option>
+        </select>
+        <br>
+        <label for="priority">Приоритет:</label>
+        <select id="priority" name="priority">
+            <option value="низкий" {% if task.priority == "низкий" %}selected{% endif %}>Низкий</option>
+            <option value="средний" {% if task.priority == "средний" %}selected{% endif %}>Средний</option>
+            <option value="высокий" {% if task.priority == "высокий" %}selected{% endif %}>Высокий</option>
+        </select>
+        <br>
+        <label for="deadline">Крайний срок:</label>
+        <input type="datetime-local" id="deadline" name="deadline" value="{{ task.deadline.strftime('%Y-%m-%dT%H:%M') if task.deadline else '' }}">
+        <br>
+        <button type="submit">Обновить задачу</button>
+    </form>
+    <span id="near-deadline-tasks" style="display:none;">{{ near_deadline_tasks | tojson | safe }}</span>
+    <div class="modal fade" id="deadlineModal" tabindex="-1" role="dialog" aria-labelledby="deadlineModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deadlineModalLabel">Внимание!</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Дедлайн для задачи <a id="taskLink" href="#">"<span id="taskTitle"></span>"</a> наступает <span id="taskDeadline"></span>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+<script src="{{ url_for('static', path='/scripts.js') }}"></script>
 {% endblock %}

@@ -39,8 +39,9 @@ def get_current_user(session_token: str = Cookie(None), db: Session = Depends(ge
     return session.user
 
 @app.get("/", response_class=HTMLResponse)
-async def read_root(request: Request, current_user: models.User = Depends(get_current_user)):
-    return templates.TemplateResponse("index.html", {"request": request, "current_user": current_user})
+async def read_root(request: Request, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    near_deadline_tasks = crud.get_tasks_with_near_deadline(db, user_id=current_user.id)
+    return templates.TemplateResponse("index.html", {"request": request, "current_user": current_user, "near_deadline_tasks": near_deadline_tasks})
 
 
 @app.get("/login", response_class=HTMLResponse)
@@ -94,17 +95,29 @@ async def register(request: Request, db: Session = Depends(get_db)):
     db_user = crud.create_user(db, user, hashed_password)
     return RedirectResponse(url="/login", status_code=status.HTTP_302_FOUND)
 
+@app.get("/tasks/{task_id}", response_class=HTMLResponse)
+async def task_page(request: Request, task_id: int, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    task = crud.get_task(db, task_id=task_id)
+    near_deadline_tasks = crud.get_tasks_with_near_deadline(db, user_id=current_user.id)
+    if task is None:
+        raise HTTPException(status_code=404, detail="Task not found")
+    if task.owner_id != current_user.id:
+        raise HTTPException(status_code=403, detail="You do not have permission to view this task")
+    return templates.TemplateResponse("task.html", {"request": request, "task": task, "current_user": current_user, "near_deadline_tasks": near_deadline_tasks})
+
 @app.get("/tasks", response_class=HTMLResponse)
 async def tasks_page(request: Request, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
     if not current_user:
         return templates.TemplateResponse("tasks.html", {"request": request, "current_user": current_user})
     else:
+        near_deadline_tasks = crud.get_tasks_with_near_deadline(db, user_id=current_user.id)
         tasks = crud.get_tasks(db, user_id=current_user.id)
-        return templates.TemplateResponse("tasks.html", {"request": request, "tasks": tasks, "current_user": current_user})
+        return templates.TemplateResponse("tasks.html", {"request": request, "tasks": tasks, "current_user": current_user, "near_deadline_tasks": near_deadline_tasks})
 
 @app.get("/tasks/create", response_class=HTMLResponse)
-async def create_task_page(request: Request, current_user: models.User = Depends(get_current_user)):
-    return templates.TemplateResponse("create_task.html", {"request": request, "current_user": current_user})
+async def create_task_page(request: Request, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    near_deadline_tasks = crud.get_tasks_with_near_deadline(db, user_id=current_user.id)
+    return templates.TemplateResponse("create_task.html", {"request": request, "current_user": current_user, "near_deadline_tasks": near_deadline_tasks})
 
 @app.post("/tasks/create", response_class=HTMLResponse)
 async def create_task(request: Request, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
@@ -128,9 +141,10 @@ async def create_task(request: Request, current_user: models.User = Depends(get_
 @app.get("/tasks/{task_id}/edit", response_class=HTMLResponse)
 async def edit_task_page(request: Request, task_id: int, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
     task = crud.get_task(db, task_id=task_id)
+    near_deadline_tasks = crud.get_tasks_with_near_deadline(db, user_id=current_user.id)
     if task is None:
         raise HTTPException(status_code=404, detail="Task not found")
-    return templates.TemplateResponse("edit_task.html", {"request": request, "task": task, "current_user": current_user})
+    return templates.TemplateResponse("edit_task.html", {"request": request, "task": task, "current_user": current_user, "near_deadline_tasks": near_deadline_tasks})
 
 @app.post("/tasks/{task_id}/edit", response_class=HTMLResponse)
 async def edit_task(request: Request, task_id: int, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):

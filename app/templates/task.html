@@ -1,18 +1,22 @@
-
 {% extends "base.html" %}
-{% block title %}Главная{% endblock %}
+
+{% block title %}Задача{% endblock %}
 
 {% block content %}
 <div class="container">
-    <h2>Добро пожаловать в Менеджер задач</h2>
-    <p>Это главная страница вашей системы управления задачами.</p>
-    <div class="links">
-        {% if not current_user %}
-        <a href="/login" class="btn btn-primary">Вход</a>
-        <a href="/register" class="btn btn-secondary">Регистрация</a>
-        {% else %}
-        <a href="/tasks" class="btn btn-success">Просмотр задач</a>
-
+    {% if not current_user %}
+    <p>Чтобы посмотреть задачу, <a href="/login">войдите</a> или <a href="/register">зарегестрируйтесь</a></p>
+    {% else %}
+        <h2>Задача {{ task.title }} </h2>
+        <p>{{ task.description }}</p>
+        <p>Статус: {{ task.status }}</p>
+        <p>Приоритет: {{ task.priority }}</p>
+        <p>Дедлайн: {{ task.deadline}}</p>
+        <a href="/tasks/{{ task.id }}/edit">Редактировать</a>
+        <form action="/tasks/{{ task.id }}/delete" method="post">
+            <button type="submit">Удалить</button>
+        </form>
+        
         <span id="near-deadline-tasks" style="display:none;">{{ near_deadline_tasks | tojson | safe }}</span>
         <div class="modal fade" id="deadlineModal" tabindex="-1" role="dialog" aria-labelledby="deadlineModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
@@ -32,8 +36,7 @@
                 </div>
             </div>
         </div>
-        {% endif %}
-    </div>
+    {% endif %}
 </div>
 <script src="{{ url_for('static', path='/scripts.js') }}"></script>
 {% endblock %}
