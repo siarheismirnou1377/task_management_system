@@ -33,6 +33,10 @@ async def read_root(request: Request):
 async def login_page(request: Request):
     return templates.TemplateResponse("login.html", {"request": request})
 
+@app.get("/logout", response_class=HTMLResponse)
+async def login_page(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
+
 @app.post("/login", response_class=HTMLResponse)
 async def login(request: Request, db: Session = Depends(get_db)):
     form = await request.form()
