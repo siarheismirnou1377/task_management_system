@@ -2,7 +2,7 @@ from datetime import datetime, timedelta, timezone
 import secrets
 from sqlalchemy.orm import Session
 from . import models, schemas
-
+from typing import List
 
 def get_user(db: Session, user_id: int):
     return db.query(models.User).filter(models.User.id == user_id).first()
@@ -71,3 +71,23 @@ def get_tasks_with_near_deadline(db: Session, user_id: int):
         models.Task.deadline > datetime.now(timezone.utc)
     ).all()
     return [task_to_dict(task) for task in tasks]
+
+def jaccard_index(set1, set2):
+    intersection = len(set1.intersection(set2))
+    union = len(set1.union(set2))
+    return intersection / union if union != 0 else 0
+
+def search_tasks(db: Session, user_id: int, query: str, threshold: float = 0.3) -> List[models.Task]:
+    query_set = set(query.split())
+    tasks = db.query(models.Task).filter(models.Task.owner_id == user_id).all()
+    similar_tasks = []
+
+    for task in tasks:
+        task_set = set(task.title.split())
+        similarity = jaccard_index(query_set, task_set)
+        if similarity >= threshold:
+            similar_tasks.append((task, similarity))
+
+    # Сортировка по убыванию сходства
+    similar_tasks.sort(key=lambda x: x[1], reverse=True)
+    return [task[0] for task in similar_tasks]

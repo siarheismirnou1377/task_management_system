@@ -1,5 +1,5 @@
 from datetime import datetime
-from fastapi import Cookie, FastAPI, Request, Depends, HTTPException, status
+from fastapi import Cookie, FastAPI, Request, Depends, HTTPException, status, Query
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
@@ -95,6 +95,18 @@ async def register(request: Request, db: Session = Depends(get_db)):
     db_user = crud.create_user(db, user, hashed_password)
     return RedirectResponse(url="/login", status_code=status.HTTP_302_FOUND)
 
+@app.get("/search", response_class=HTMLResponse)
+async def search_tasks_page(request: Request, query: str = Query(None), current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    if not current_user:
+        return templates.TemplateResponse("search.html", {"request": request, "current_user": current_user})
+    else:
+        near_deadline_tasks = crud.get_tasks_with_near_deadline(db, user_id=current_user.id)
+        if query:
+            tasks = crud.search_tasks(db, user_id=current_user.id, query=query)
+        else:
+            tasks = []
+        return templates.TemplateResponse("search.html", {"request": request, "tasks": tasks, "query": query, "current_user": current_user, "near_deadline_tasks": near_deadline_tasks})
+
 @app.get("/tasks", response_class=HTMLResponse)
 async def tasks_page(request: Request, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
     if not current_user:
@@ -173,3 +185,4 @@ async def task_page(request: Request, task_id: int, current_user: models.User = 
     if task.owner_id != current_user.id:
         raise HTTPException(status_code=403, detail="You do not have permission to view this task")
     return templates.TemplateResponse("task.html", {"request": request, "task": task, "current_user": current_user, "near_deadline_tasks": near_deadline_tasks})
+

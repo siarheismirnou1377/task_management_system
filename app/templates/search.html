@@ -1,34 +1,27 @@
 {% extends "base.html" %}
-
-{% block title %}Задачи{% endblock %}
+{% block title %}Поиск задач{% endblock %}
 
 {% block content %}
-
-    {% if not current_user %}
+{% if not current_user %}
     <p>Чтобы посмотреть список задач, <a href="/login">войдите</a> или <a href="/register">зарегестрируйтесь</a></p>
-    {% else %}
+{% else %}
     <form action="/search" method="get">
         <input type="text" name="query" placeholder="Введите название задачи" value="{{ query }}">
         <button type="submit">Поиск</button>
     </form>
-        <h2>Задачи</h2>
-        <a href="/tasks/create">Создать новую задачу</a>
-        <ul>
-            {% for task in tasks %}
-            <li>
-                <h3>{{ task.title }}</h3>
-                <p>{{ task.description }}</p>
-                <p>Статус: {{ task.status }}</p>
-                <p>Приоритет: {{ task.priority }}</p>
-                <p>Дедлайн: {{ task.deadline}}</p>
-                <a href="/tasks/{{ task.id }}/edit">Редактировать</a>
-                <form action="/tasks/{{ task.id }}/delete" method="post">
-                    <button type="submit">Удалить</button>
-                </form>
-            </li>
-            {% endfor %}
-        </ul>
-        <span id="near-deadline-tasks" style="display:none;">{{ near_deadline_tasks | tojson | safe }}</span>
+    {% if tasks %}
+    <h2>Результы поиска</h2>
+    <ul>
+        {% for task in tasks %}
+        <li>
+            <a href="/tasks/{{ task.id }}">{{ task.title }}</a>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>Задач не найдено.</p>
+    {% endif %}
+    <span id="near-deadline-tasks" style="display:none;">{{ near_deadline_tasks | tojson | safe }}</span>
         <div class="modal fade" id="deadlineModal" tabindex="-1" role="dialog" aria-labelledby="deadlineModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -47,7 +40,7 @@
                 </div>
             </div>
         </div>
-    {% endif %}
+{% endif %}
 
 <script src="{{ url_for('static', path='/scripts.js') }}"></script>
 {% endblock %}
