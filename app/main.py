@@ -109,12 +109,18 @@ async def create_task_page(request: Request, current_user: models.User = Depends
 @app.post("/tasks/create", response_class=HTMLResponse)
 async def create_task(request: Request, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
     form = await request.form()
+    
+    if not form.get("deadline"):
+        deadline = None
+    else:
+        deadline = form.get("deadline")
+        
     task = schemas.TaskCreate(
         title=form.get("title"),
         description=form.get("description"),
         status=form.get("status"),
         priority=form.get("priority"),
-        deadline=form.get("deadline")
+        deadline=deadline
     )
     crud.create_task(db, task, user_id=current_user.id)
     return RedirectResponse(url="/tasks", status_code=status.HTTP_302_FOUND)
