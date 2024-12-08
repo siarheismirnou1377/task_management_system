@@ -3,6 +3,9 @@
 {% block title %}Задачи{% endblock %}
 
 {% block content %}
+{% if not current_user %}
+<p>Чтобы посмотреть список задач, <a href="/login">войдите</a> или <a href="/register">зарегестрируйтесь</a></p>
+{% else %}
 <h2>Задачи</h2>
 <a href="/tasks/create">Создать новую задачу</a>
 <ul>
@@ -19,4 +22,5 @@
     </li>
     {% endfor %}
 </ul>
+{% endif %}
 {% endblock %}

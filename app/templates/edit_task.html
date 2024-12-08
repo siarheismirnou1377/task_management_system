@@ -3,6 +3,9 @@
 {% block title %}Редактировать задачу{% endblock %}
 
 {% block content %}
+{% if not current_user %}
+<p>Чтобы редактировать задачи, <a href="/login">войдите</a> или <a href="/register">зарегестрируйтесь</a></p>
+{% else %}
 <h2>Редактировать задачу</h2>
 <form action="/tasks/{{ task.id }}/edit" method="post">
     <label for="title">Заголовок:</label>
@@ -30,4 +33,5 @@
     <br>
     <button type="submit">Обновить задачу</button>
 </form>
+{% endif %}
 {% endblock %}

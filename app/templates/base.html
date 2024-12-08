@@ -11,10 +11,13 @@
         <h1>Менеджер задач</h1>
         <nav>
             <a href="/">Главная</a>
-            <a href="/tasks">Задачи</a>
+            {% if not current_user %}
             <a href="/login">Вход</a>
-            <a href="/logout">Выход</a>
             <a href="/register">Регистрация</a>
+            {% else %}
+            <a href="/tasks">Задачи</a>
+            <a href="/logout">Выход</a>
+            {% endif %}
         </nav>
     </header>
     <main>

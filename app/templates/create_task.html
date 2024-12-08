@@ -3,6 +3,10 @@
 {% block title %}Создать задачу{% endblock %}
 
 {% block content %}
+
+{% if not current_user %}
+<p>Чтобы создать задачу <a href="/login">войдите</a> или <a href="/register">зарегестрируйтесь</a>.</p>
+{% else %}
 <h2>Создать задачу</h2>
 <form action="/tasks/create" method="post">
     <label for="title">Заголовок:</label>
@@ -30,4 +34,5 @@
     <br>
     <button type="submit">Создать задачу</button>
 </form>
+{% endif %}
 {% endblock %}

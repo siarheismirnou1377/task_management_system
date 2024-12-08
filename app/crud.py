@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+import secrets
 from sqlalchemy.orm import Session
 from . import models, schemas
 
@@ -33,3 +35,19 @@ def delete_task(db: Session, task_id: int):
     if task:
         db.delete(task)
         db.commit()
+
+def create_session(db: Session, user_id: int) -> models.Session:
+    session_token = secrets.token_hex(32)
+    expires_at = datetime.utcnow() + timedelta(days=7)  # Сессия действительна 7 дней
+    db_session = models.Session(user_id=user_id, session_token=session_token, expires_at=expires_at)
+    db.add(db_session)
+    db.commit()
+    db.refresh(db_session)
+    return db_session
+
+def get_session(db: Session, session_token: str) -> models.Session:
+    return db.query(models.Session).filter(models.Session.session_token == session_token).first()
+
+def delete_session(db: Session, session_token: str):
+    db.query(models.Session).filter(models.Session.session_token == session_token).delete()
+    db.commit()
