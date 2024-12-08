@@ -95,16 +95,6 @@ async def register(request: Request, db: Session = Depends(get_db)):
     db_user = crud.create_user(db, user, hashed_password)
     return RedirectResponse(url="/login", status_code=status.HTTP_302_FOUND)
 
-@app.get("/tasks/{task_id}", response_class=HTMLResponse)
-async def task_page(request: Request, task_id: int, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    task = crud.get_task(db, task_id=task_id)
-    near_deadline_tasks = crud.get_tasks_with_near_deadline(db, user_id=current_user.id)
-    if task is None:
-        raise HTTPException(status_code=404, detail="Task not found")
-    if task.owner_id != current_user.id:
-        raise HTTPException(status_code=403, detail="You do not have permission to view this task")
-    return templates.TemplateResponse("task.html", {"request": request, "task": task, "current_user": current_user, "near_deadline_tasks": near_deadline_tasks})
-
 @app.get("/tasks", response_class=HTMLResponse)
 async def tasks_page(request: Request, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
     if not current_user:
@@ -173,3 +163,13 @@ async def delete_task(request: Request, task_id: int, current_user: models.User 
     
     crud.delete_task(db, task_id)
     return RedirectResponse(url="/tasks", status_code=status.HTTP_302_FOUND)
+
+@app.get("/tasks/{task_id}", response_class=HTMLResponse)
+async def task_page(request: Request, task_id: int, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    task = crud.get_task(db, task_id=task_id)
+    near_deadline_tasks = crud.get_tasks_with_near_deadline(db, user_id=current_user.id)
+    if task is None:
+        raise HTTPException(status_code=404, detail="Task not found")
+    if task.owner_id != current_user.id:
+        raise HTTPException(status_code=403, detail="You do not have permission to view this task")
+    return templates.TemplateResponse("task.html", {"request": request, "task": task, "current_user": current_user, "near_deadline_tasks": near_deadline_tasks})
