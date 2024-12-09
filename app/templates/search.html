@@ -6,11 +6,11 @@
     <p>Чтобы посмотреть список задач, <a href="/login">войдите</a> или <a href="/register">зарегестрируйтесь</a></p>
 {% else %}
     <form action="/search" method="get">
-        <input type="text" name="query" placeholder="Введите название задачи" value="{{ query }}">
+        <input type="text" name="query" placeholder="Поиск" value="{{ query }}">
         <button type="submit">Поиск</button>
     </form>
     {% if tasks %}
-    <h2>Результы поиска</h2>
+    <h2>Результаты поиска</h2>
     <ul>
         {% for task in tasks %}
         <li>
