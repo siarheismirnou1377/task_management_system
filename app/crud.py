@@ -3,6 +3,7 @@ import secrets
 from sqlalchemy.orm import Session
 from . import models, schemas
 from typing import List
+from Levenshtein import distance as levenshtein_distance
 
 def get_user(db: Session, user_id: int):
     return db.query(models.User).filter(models.User.id == user_id).first()
@@ -72,22 +73,15 @@ def get_tasks_with_near_deadline(db: Session, user_id: int):
     ).all()
     return [task_to_dict(task) for task in tasks]
 
-def jaccard_index(set1, set2):
-    intersection = len(set1.intersection(set2))
-    union = len(set1.union(set2))
-    return intersection / union if union != 0 else 0
-
-def search_tasks(db: Session, user_id: int, query: str, threshold: float = 0.3) -> List[models.Task]:
-    query_set = set(query.split())
+def search_tasks(db: Session, user_id: int, query: str, threshold: int = 5) -> list[models.Task]:
     tasks = db.query(models.Task).filter(models.Task.owner_id == user_id).all()
     similar_tasks = []
 
     for task in tasks:
-        task_set = set(task.title.split())
-        similarity = jaccard_index(query_set, task_set)
-        if similarity >= threshold:
-            similar_tasks.append((task, similarity))
+        distance = levenshtein_distance(query.lower(), task.title.lower())
+        if distance <= threshold:
+            similar_tasks.append((task, distance))
 
-    # Сортировка по убыванию сходства
-    similar_tasks.sort(key=lambda x: x[1], reverse=True)
+    # Сортировка по возрастанию расстояния
+    similar_tasks.sort(key=lambda x: x[1])
     return [task[0] for task in similar_tasks]
