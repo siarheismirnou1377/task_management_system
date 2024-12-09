@@ -12,7 +12,6 @@ models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 
@@ -112,8 +111,10 @@ async def tasks_page(request: Request, current_user: models.User = Depends(get_c
     if not current_user:
         return templates.TemplateResponse("tasks.html", {"request": request, "current_user": current_user})
     else:
-        near_deadline_tasks = crud.get_tasks_with_near_deadline(db, user_id=current_user.id)
         tasks = crud.get_tasks(db, user_id=current_user.id)
+        # Сортировка задач по приоритету
+        tasks.sort(key=lambda task: {"низкий": 3, "средний": 2, "высокий": 1}[task.priority])
+        near_deadline_tasks = crud.get_tasks_with_near_deadline(db, user_id=current_user.id)
         return templates.TemplateResponse("tasks.html", {"request": request, "tasks": tasks, "current_user": current_user, "near_deadline_tasks": near_deadline_tasks})
 
 @app.get("/tasks/create", response_class=HTMLResponse)
