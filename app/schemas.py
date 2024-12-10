@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 from pydantic import BaseModel
 from datetime import datetime
 
@@ -33,7 +33,7 @@ class UserCreate(UserBase):
 
 class User(UserBase):
     id: int
-    tasks: list[Task] = []
+    tasks: List[Task] = []
 
     class Config:
         from_attributes = True

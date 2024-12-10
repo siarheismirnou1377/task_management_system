@@ -1,36 +1,43 @@
-from sqlalchemy import Column, Integer, String, DateTime, Enum, ForeignKey
+from sqlalchemy import Integer, String, DateTime, Enum, ForeignKey
 from sqlalchemy.orm import relationship
-from .database import Base
+from sqlalchemy.orm import Mapped
+from sqlalchemy.orm import mapped_column
+from sqlalchemy.orm import DeclarativeBase
+from typing import List, Optional
+
+
+class Base(DeclarativeBase):
+    pass
 
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True, index=True)
-    username = Column(String, unique=True, index=True)
-    hashed_password = Column(String)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    username: Mapped[str] = mapped_column(String, unique=True, index=True)
+    hashed_password: Mapped[str] = mapped_column(String)
 
-    tasks = relationship("Task", back_populates="owner")
-    sessions = relationship("Session", back_populates="user")
+    tasks: Mapped[List["Task"]] = relationship("Task", back_populates="owner")
+    sessions: Mapped[List["Session"]] = relationship("Session", back_populates="user")
 
 class Task(Base):
     __tablename__ = "tasks"
 
-    id = Column(Integer, primary_key=True, index=True)
-    title = Column(String, index=True)
-    description = Column(String, index=True)
-    status = Column(Enum("новая", "в процессе", "завершена", name="status_enum"), default="новая")
-    priority = Column(Enum("низкий", "средний", "высокий", name="priority_enum"), default="средний")
-    deadline = Column(DateTime, nullable=True)
-    owner_id = Column(Integer, ForeignKey("users.id"))
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    title: Mapped[str] = mapped_column(String, index=True)
+    description: Mapped[str] = mapped_column(String, index=True)
+    status: Mapped[str] = mapped_column(Enum("новая", "в процессе", "завершена", name="status_enum"), default="новая")
+    priority: Mapped[str] = mapped_column(Enum("низкий", "средний", "высокий", name="priority_enum"), default="средний")
+    deadline: Mapped[Optional[DateTime]] = mapped_column(DateTime, nullable=True)
+    owner_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
 
-    owner = relationship("User", back_populates="tasks")
+    owner: Mapped["User"] = relationship("User", back_populates="tasks")
 
 class Session(Base):
     __tablename__ = "sessions"
 
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
-    session_token = Column(String, unique=True, index=True)
-    expires_at = Column(DateTime)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
+    session_token: Mapped[str] = mapped_column(String, unique=True, index=True)
+    expires_at: Mapped[DateTime] = mapped_column(DateTime)
 
-    user = relationship("User", back_populates="sessions")
+    user: Mapped["User"] = relationship("User", back_populates="sessions")

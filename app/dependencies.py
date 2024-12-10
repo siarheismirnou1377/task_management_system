@@ -3,23 +3,21 @@ from fastapi import Depends, Cookie
 from sqlalchemy.orm import Session
 from . import crud, models
 from .database import SessionLocal
+from typing import Generator, Optional
 
-
-def get_db():
+def get_db() -> Generator[Session, None, None]:
     db = SessionLocal()
     try:
         yield db
     finally:
         db.close()
 
-def get_current_user(session_token: str = Cookie(None), db: Session = Depends(get_db)) -> models.User:
+def get_current_user(session_token: Optional[str] = Cookie(None), db: Session = Depends(get_db)) -> Optional[models.User]:
     if session_token is None:
         return None
-        # raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
 
-    session = crud.get_session(db, session_token)
+    session: Optional[models.Session] = crud.get_session(db, session_token)
     if session is None or session.expires_at < datetime.utcnow():
         return None
-        # raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Session expired")
 
     return session.user
