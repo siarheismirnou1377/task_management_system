@@ -3,16 +3,19 @@
 {% block title %}Главная{% endblock %}
 
 {% block content %}
-
+<div class="row justify-content-center">
     <h2>Добро пожаловать в Менеджер задач</h2>
-    <p>Это главная страница вашей системы управления задачами.</p>
-    <div class="links">
+</div>
+    <div class="row justify-content-center">
+        
         {% if not current_user %}
+        <div class="form-group justify-content-between mt-3">
         <a href="/login" class="btn btn-primary">Вход</a>
         <a href="/register" class="btn btn-secondary">Регистрация</a>
+        </div>
         {% else %}
-        <a href="/tasks" class="btn btn-success">Просмотр задач</a>
-
+        <a href="/tasks" class="btn btn-success">Перейти к задачам</a>
+    </div>
         <span id="near-deadline-tasks" style="display:none;">{{ near_deadline_tasks | tojson | safe }}</span>
         <div class="modal fade" id="deadlineModal" tabindex="-1" role="dialog" aria-labelledby="deadlineModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
@@ -33,6 +36,5 @@
             </div>
         </div>
         {% endif %}
-    </div>
 <script src="{{ url_for('static', path='/scripts.js') }}"></script>
 {% endblock %}

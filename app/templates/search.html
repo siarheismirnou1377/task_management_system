@@ -3,24 +3,33 @@
 
 {% block content %}
 {% if not current_user %}
+<div class="col-md-12 d-flex justify-content-center">
     <p>Чтобы посмотреть список задач, <a href="/login">войдите</a> или <a href="/register">зарегестрируйтесь</a></p>
+</div>
 {% else %}
-    <form action="/search" method="get">
-        <input type="text" name="query" placeholder="Поиск" value="{{ query }}">
-        <button type="submit">Поиск</button>
-    </form>
-    {% if tasks %}
-    <h2>Результаты поиска</h2>
-    <ul>
-        {% for task in tasks %}
-        <li>
-            <a href="/tasks/{{ task.id }}">{{ task.title }}</a>
-        </li>
-        {% endfor %}
-    </ul>
-    {% else %}
-    <p>Задач не найдено.</p>
-    {% endif %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <form action="/search" method="get" class="input-group mb-3">
+            <input type="text" name="query" class="form-control" placeholder="Поиск" value="{{ query }}">
+            <div class="input-group-append">
+                <button type="submit" class="btn btn-primary">Поиск</button>
+            </div>
+        </form>
+
+        {% if tasks %}
+        <h2 class="mt-4">Результаты поиска</h2>
+        <ul class="list-group">
+            {% for task in tasks %}
+            <li class="list-group-item">
+                <a href="/tasks/{{ task.id }}">{{ task.title }}</a>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="mt-4">Задач не найдено.</p>
+        {% endif %}
+    </div>
+</div>
     <span id="near-deadline-tasks" style="display:none;">{{ near_deadline_tasks | tojson | safe }}</span>
         <div class="modal fade" id="deadlineModal" tabindex="-1" role="dialog" aria-labelledby="deadlineModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">

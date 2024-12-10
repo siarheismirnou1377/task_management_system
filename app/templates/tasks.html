@@ -26,27 +26,11 @@
             <ul>
                 {% for task in tasks if task.status == "новая" %}
                 <div class="col-md-12">
-                <ol>
-                    <h4>{{ task.title }}</h4>
-                    <p>{{ task.description }}</p>
-                    <p class="status-{{ task.status }}">Статус: {{ task.status }}</p>
-                    <p class="priority-{{ task.priority }}">Приоритет: {{ task.priority }}</p>
-                    <p>Дедлайн: {{ task.deadline }}</p>
-                    <a href="/tasks/{{ task.id }}/edit" class="btn btn-primary">Редактировать</a>
-                    <form action="/tasks/{{ task.id }}/delete" method="post" style="display:inline;">
-                        <button type="submit" class="btn btn-danger">Удалить</button>
-                    </form>
-                </ol>
-            </div>
-                {% endfor %}
-            </ul>
-            <ul>
-                {% for task in tasks if task.status == "в процессе" %}
-                <div class="col-md-12">
-                <ol>
-                    
-                        <h4>{{ task.title }}</h4>
-                        <p>{{ task.description }}</p>
+                    <ol>
+                        <a href="/tasks/{{ task.id }}">
+                            <h4>{{ task.title|truncate(17, True, '...') }}</h4>
+                        </a>
+                        <p>{{ task.description|truncate(17, True, '...') }}</p>
                         <p class="status-{{ task.status }}">Статус: {{ task.status }}</p>
                         <p class="priority-{{ task.priority }}">Приоритет: {{ task.priority }}</p>
                         <p>Дедлайн: {{ task.deadline }}</p>
@@ -54,18 +38,37 @@
                         <form action="/tasks/{{ task.id }}/delete" method="post" style="display:inline;">
                             <button type="submit" class="btn btn-danger">Удалить</button>
                         </form>
-                    
-                </ol>
-            </div>
+                    </ol>
+                </div>
+                {% endfor %}
+            </ul>
+            <ul>
+                {% for task in tasks if task.status == "в процессе" %}
+                    <div class="col-md-12">
+                        <ol>
+                            <a href="/tasks/{{ task.id }}">
+                                <h4>{{ task.title|truncate(17, True, '...') }}</h4>
+                            </a>
+                            <p>{{ task.description|truncate(17, True, '...') }}</p>
+                            <p class="status-{{ task.status }}">Статус: {{ task.status }}</p>
+                            <p class="priority-{{ task.priority }}">Приоритет: {{ task.priority }}</p>
+                            <p>Дедлайн: {{ task.deadline }}</p>
+                            <a href="/tasks/{{ task.id }}/edit" class="btn btn-primary">Редактировать</a>
+                            <form action="/tasks/{{ task.id }}/delete" method="post" style="display:inline;">
+                                <button type="submit" class="btn btn-danger">Удалить</button>
+                            </form>
+                        </ol>
+                    </div>
                 {% endfor %}
             </ul>
             <ul>
                 {% for task in tasks if task.status == "завершена" %}
                 <div class="col-md-12">
-                <ol>
-                    
-                        <h4>{{ task.title }}</h4>
-                        <p>{{ task.description }}</p>
+                    <ol>
+                        <a href="/tasks/{{ task.id }}">
+                            <h4>{{ task.title|truncate(17, True, '...') }}</h4>
+                        </a>
+                        <p>{{ task.description|truncate(17, True, '...') }}</p>
                         <p class="status-{{ task.status }}">Статус: {{ task.status }}</p>
                         <p class="priority-{{ task.priority }}">Приоритет: {{ task.priority }}</p>
                         <p>Дедлайн: {{ task.deadline }}</p>
@@ -73,9 +76,8 @@
                         <form action="/tasks/{{ task.id }}/delete" method="post" style="display:inline;">
                             <button type="submit" class="btn btn-danger">Удалить</button>
                         </form>
-                    
-                </ol>
-            </div>
+                    </ol>
+                </div>
                 {% endfor %}
             </ul>
     </div>
