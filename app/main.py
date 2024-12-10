@@ -1,4 +1,5 @@
 from datetime import datetime
+import re
 from fastapi import Cookie, FastAPI, Request, Depends, HTTPException, status, Query
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
@@ -29,12 +30,12 @@ def get_current_user(session_token: str = Cookie(None), db: Session = Depends(ge
     if session_token is None:
         return None
         # raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
-    
+
     session = crud.get_session(db, session_token)
     if session is None or session.expires_at < datetime.utcnow():
         return None
         # raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Session expired")
-    
+
     return session.user
 
 @app.get("/", response_class=HTMLResponse)
@@ -106,8 +107,14 @@ async def register(request: Request, db: Session = Depends(get_db)):
 
     if not username:
         errors["username"] = "Имя пользователя не может быть пустым"
+    elif not re.match(r"^[a-zA-Z0-9_-]{1,8}$", username):
+        errors["username"] = "Логин должен содержать только буквы, цифры, дефисы и подчеркивания, не более 8 символов"
+
     if not password:
         errors["password"] = "Пароль не может быть пустым"
+    elif len(password) < 4:
+        errors["password"] = "Пароль должен быть не менее 4 символов"
+
 
     if errors:
         return templates.TemplateResponse("register.html", {"request": request, "errors": errors})
@@ -218,6 +225,12 @@ async def create_task(request: Request, current_user: models.User = Depends(get_
     if not form.get("description"):
         errors["description"] = "Описание не может быть пустым"
 
+    if len(form.get("title")) > 13:
+        errors["title"] = "Заголовок должен быть не длиннее 13 символов"
+
+    if len(form.get("description")) > 200:
+        errors["description"] = "Описание должно быть не длиннее 200 символов"
+
     if errors:
         return templates.TemplateResponse("create_task.html", {
             "request": request,
@@ -259,6 +272,12 @@ async def edit_task(request: Request, task_id: int, current_user: models.User = 
         errors["title"] = "Заголовок не может быть пустым"
     if not form.get("description"):
         errors["description"] = "Описание не может быть пустым"
+    
+    if len(form.get("title")) > 13:
+        errors["title"] = "Заголовок должен быть не длиннее 13 символов"
+
+    if len(form.get("description")) > 200:
+        errors["description"] = "Описание должно быть не длиннее 200 символов"
 
     existing_task = crud.get_task(db, task_id)
     if existing_task is None or existing_task.owner_id != current_user.id:

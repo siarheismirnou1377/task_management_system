@@ -42,7 +42,7 @@ def get_task(db: Session, task_id: int):
 def update_task(db: Session, task_id: int, task: schemas.TaskCreate):
     db_task = db.query(models.Task).filter(models.Task.id == task_id).first()
     if db_task is None:
-        return None  # Или вы можете выбросить исключение, если задача не найдена
+        return None
 
     db_task.title = task.title
     db_task.description = task.description
@@ -104,6 +104,5 @@ def search_tasks(db: Session, user_id: int, query: str, threshold: int = 5) -> l
         distance = levenshtein_distance(query.lower(), task.title.lower())
         if distance <= threshold:
             similar_tasks.append((task, distance))
-            
     similar_tasks.sort(key=lambda x: x[1])
     return [task[0] for task in similar_tasks]

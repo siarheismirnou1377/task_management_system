@@ -16,24 +16,24 @@
         <form action="/tasks/create" method="post" class="needs-validation" novalidate>
             <div class="form-group">
                 <label for="title">Заголовок:</label>
-                <input type="text" class="form-control {% if errors.title %}is-invalid{% endif %}" id="title" name="title" required>
+                <input type="text" class="form-control {% if errors.title %}is-invalid{% endif %}" id="title" name="title" maxlength="13" required>
                 <div class="invalid-feedback">
                     {% if errors.title %}
                     {{ errors.title }}
                     {% else %}
-                    Пожалуйста, введите заголовок.
+                    Заголовок должен быть не длиннее 13 символов.
                     {% endif %}
                 </div>
             </div>
 
             <div class="form-group">
                 <label for="description">Описание:</label>
-                <textarea class="form-control {% if errors.description %}is-invalid{% endif %}" id="description" name="description" rows="3" required></textarea>
+                <textarea class="form-control {% if errors.description %}is-invalid{% endif %}" id="description" name="description" rows="3" maxlength="200" required></textarea>
                 <div class="invalid-feedback">
                     {% if errors.description %}
                     {{ errors.description }}
                     {% else %}
-                    Пожалуйста, введите описание.
+                    Описание должно быть не длиннее 200 символов.
                     {% endif %}
                 </div>
             </div>
@@ -67,6 +67,27 @@
             </div>
         </form>
     </div>
+    <span id="near-deadline-tasks" style="display:none;">{{ near_deadline_tasks | tojson | safe }}</span>
+    <div class="modal fade" id="deadlineModal" tabindex="-1" role="dialog" aria-labelledby="deadlineModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deadlineModalLabel">Внимание!</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Дедлайн для задачи <a id="taskLink" href="#">"<span id="taskTitle"></span>"</a> наступает <span id="taskDeadline"></span>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     {% endif %}
 </div>
+<script src="{{ url_for('static', path='/scripts.js') }}"></script>
 {% endblock %}

@@ -19,17 +19,33 @@ function showDeadlineModal(taskTitle, taskDeadline, taskId) {
     document.getElementById('taskDeadline').textContent = new Date(taskDeadline).toLocaleString();
     document.getElementById('taskLink').href = `/tasks/${taskId}`;
     modal.show();
-    // Обновляем время последнего показа для этой задачи
     localStorage.setItem('lastShownTime_' + taskId, new Date().getTime());
 }
 
 function shouldShowModal(taskId) {
     var lastShownTime = localStorage.getItem('lastShownTime_' + taskId);
     var currentTime = new Date().getTime();
-    var oneHour = 60 * 60 * 1000; // 1 час в миллисекундах
+    var oneHour = 60 * 60 * 1000;
 
     if (!lastShownTime || (currentTime - lastShownTime) > oneHour) {
         return true;
     }
     return false;
 }
+
+(function () {
+    'use strict';
+
+    var forms = document.querySelectorAll('.needs-validation');
+
+    Array.prototype.slice.call(forms).forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+
+            form.classList.add('was-validated');
+        }, false);
+    });
+})();
