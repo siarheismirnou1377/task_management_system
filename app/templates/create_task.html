@@ -14,7 +14,6 @@
     {% else %}
     <div class="col-md-5 d-flex justify-content-center">
         <form action="/tasks/create" method="post" class="needs-validation" novalidate>
-            <!-- Заголовок -->
             <div class="form-group">
                 <label for="title">Заголовок:</label>
                 <input type="text" class="form-control {% if errors.title %}is-invalid{% endif %}" id="title" name="title" required>
