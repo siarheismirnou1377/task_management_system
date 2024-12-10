@@ -11,3 +11,5 @@ LOGIN: str = os.getenv('LOGIN')
 PASSWORD: str = os.getenv('PASSWORD')
 
 DB_NAME: str = os.getenv('DB_NAME')
+
+HOST: str = os.getenv('HOST')
