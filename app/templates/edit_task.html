@@ -9,23 +9,38 @@
 <div class="row justify-content-center">
     {% if not current_user %}
     <div class="col-md-12 d-flex justify-content-center">
-        <p>Чтобы редактировать задачи, <a href="/login">войдите</a> или <a href="/register">зарегестрируйтесь</a></p>
+        <p>Чтобы редактировать задачи, <a href="/login">войдите</a> или <a href="/register">зарегистрируйтесь</a></p>
     </div>
     {% else %}
     <div class="col-md-5 d-flex justify-content-center">
         <form action="/tasks/{{ task.id }}/edit" method="post" class="needs-validation" novalidate>
+            <!-- Заголовок -->
             <div class="form-group">
                 <label for="title">Заголовок:</label>
-                <input type="text" class="form-control" id="title" name="title" value="{{ task.title }}" required>
-                <div class="invalid-feedback">Пожалуйста, введите заголовок.</div>
+                <input type="text" class="form-control {% if errors.title %}is-invalid{% endif %}" id="title" name="title" value="{{ task.title }}" required>
+                <div class="invalid-feedback">
+                    {% if errors.title %}
+                    {{ errors.title }}
+                    {% else %}
+                    Пожалуйста, введите заголовок.
+                    {% endif %}
+                </div>
             </div>
 
+            <!-- Описание -->
             <div class="form-group">
                 <label for="description">Описание:</label>
-                <textarea class="form-control" id="description" name="description" rows="3" required>{{ task.description }}</textarea>
-                <div class="invalid-feedback">Пожалуйста, введите описание.</div>
+                <textarea class="form-control {% if errors.description %}is-invalid{% endif %}" id="description" name="description" rows="3" required>{{ task.description }}</textarea>
+                <div class="invalid-feedback">
+                    {% if errors.description %}
+                    {{ errors.description }}
+                    {% else %}
+                    Пожалуйста, введите описание.
+                    {% endif %}
+                </div>
             </div>
 
+            <!-- Статус -->
             <div class="form-group">
                 <label for="status">Статус:</label>
                 <select class="form-control" id="status" name="status">
@@ -35,6 +50,7 @@
                 </select>
             </div>
 
+            <!-- Приоритет -->
             <div class="form-group">
                 <label for="priority">Приоритет:</label>
                 <select class="form-control" id="priority" name="priority">
@@ -44,38 +60,26 @@
                 </select>
             </div>
 
+            <!-- Крайний срок -->
             <div class="form-group">
                 <label for="deadline">Крайний срок:</label>
                 <input type="datetime-local" class="form-control" id="deadline" name="deadline" value="{{ task.deadline.strftime('%Y-%m-%dT%H:%M') if task.deadline else '' }}">
             </div>
 
+            <!-- Общая ошибка -->
+            {% if errors.permission %}
+            <div class="alert alert-danger" role="alert">
+                {{ errors.permission }}
+            </div>
+            {% endif %}
+
+            <!-- Кнопки -->
             <div class="form-group justify-content-between mt-3">
                 <button type="submit" class="btn btn-success me-3">Обновить задачу</button>
                 <a href="/tasks" class="btn btn-secondary">Отмена</a>
             </div>
         </form>
     </div>
-</div>
-    <span id="near-deadline-tasks" style="display:none;">{{ near_deadline_tasks | tojson | safe }}</span>
-    <div class="modal fade" id="deadlineModal" tabindex="-1" role="dialog" aria-labelledby="deadlineModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deadlineModalLabel">Внимание!</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    Дедлайн для задачи <a id="taskLink" href="#">"<span id="taskTitle"></span>"</a> наступает <span id="taskDeadline"></span>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
-                </div>
-            </div>
-        </div>
-    </div>
     {% endif %}
-
-<script src="{{ url_for('static', path='/scripts.js') }}"></script>
+</div>
 {% endblock %}

@@ -9,15 +9,33 @@
         <form action="/login" method="post" class="needs-validation" novalidate>
             <div class="form-group">
                 <label for="username">Имя пользователя:</label>
-                <input type="text" class="form-control" id="username" name="username" required>
-                <div class="invalid-feedback">Пожалуйста, введите имя пользователя.</div>
+                <input type="text" class="form-control {% if errors.username %}is-invalid{% endif %}" id="username" name="username" required>
+                <div class="invalid-feedback">
+                    {% if errors.username %}
+                    {{ errors.username }}
+                    {% else %}
+                    Пожалуйста, введите имя пользователя.
+                    {% endif %}
+                </div>
             </div>
 
             <div class="form-group">
                 <label for="password">Пароль:</label>
-                <input type="password" class="form-control" id="password" name="password" required>
-                <div class="invalid-feedback">Пожалуйста, введите пароль.</div>
+                <input type="password" class="form-control {% if errors.password %}is-invalid{% endif %}" id="password" name="password" required>
+                <div class="invalid-feedback">
+                    {% if errors.password %}
+                    {{ errors.password }}
+                    {% else %}
+                    Пожалуйста, введите пароль.
+                    {% endif %}
+                </div>
             </div>
+            
+            {% if errors.login %}
+            <div class="alert alert-danger" role="alert">
+                {{ errors.login }}
+            </div>
+            {% endif %}
 
             <div class="form-group d-flex justify-content-center mt-3">
                 <button type="submit" class="btn btn-primary w-100">Войти</button>

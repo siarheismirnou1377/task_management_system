@@ -6,76 +6,68 @@
 <div class="row justify-content-center">
     <h2>Создать задачу</h2>
 </div>
-    <div class="row justify-content-center">
-        {% if not current_user %}
-        <div class="col-md-12 d-flex justify-content-center">
-            <p>Чтобы создать задачу <a href="/login">войдите</a> или <a href="/register">зарегестрируйтесь</a>.</p>
-        </div>
-        {% else %}
-        
-        <div class="col-md-5 d-flex justify-content-center">
-            <form action="/tasks/create" method="post" class="needs-validation" novalidate>
-                <div class="form-group">
-                    <label for="title">Заголовок:</label>
-                    <input type="text" class="form-control" id="title" name="title" required>
-                    <div class="invalid-feedback">Пожалуйста, введите заголовок.</div>
-                </div>
-            
-                <div class="form-group">
-                    <label for="description">Описание:</label>
-                    <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
-                    <div class="invalid-feedback">Пожалуйста, введите описание.</div>
-                </div>
-            
-                <div class="form-group">
-                    <label for="status">Статус:</label>
-                    <select class="form-control" id="status" name="status">
-                        <option value="новая">Новая</option>
-                        <option value="в процессе">В процессе</option>
-                        <option value="завершена">Завершена</option>
-                    </select>
-                </div>
-            
-                <div class="form-group">
-                    <label for="priority">Приоритет:</label>
-                    <select class="form-control" id="priority" name="priority">
-                        <option value="низкий">Низкий</option>
-                        <option value="средний">Средний</option>
-                        <option value="высокий">Высокий</option>
-                    </select>
-                </div>
-            
-                <div class="form-group">
-                    <label for="deadline">Дедлайн:</label>
-                    <input type="datetime-local" class="form-control" id="deadline" name="deadline">
-                </div>
-                <div class="form-group justify-content-center">
-                    <button type="submit" class="btn btn-success me-3">Создать задачу</button>
-                    <a href="/tasks/create" class="btn btn-secondary">Отмена</a>
-                </div>
-            </form>
-        </div>
+<div class="row justify-content-center">
+    {% if not current_user %}
+    <div class="col-md-12 d-flex justify-content-center">
+        <p>Чтобы создать задачу <a href="/login">войдите</a> или <a href="/register">зарегистрируйтесь</a>.</p>
     </div>
-    <span id="near-deadline-tasks" style="display:none;">{{ near_deadline_tasks | tojson | safe }}</span>
-    <div class="modal fade" id="deadlineModal" tabindex="-1" role="dialog" aria-labelledby="deadlineModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deadlineModalLabel">Внимание!</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    Дедлайн для задачи <a id="taskLink" href="#">"<span id="taskTitle"></span>"</a> наступает через <span id="taskDeadline"></span>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+    {% else %}
+    <div class="col-md-5 d-flex justify-content-center">
+        <form action="/tasks/create" method="post" class="needs-validation" novalidate>
+            <!-- Заголовок -->
+            <div class="form-group">
+                <label for="title">Заголовок:</label>
+                <input type="text" class="form-control {% if errors.title %}is-invalid{% endif %}" id="title" name="title" required>
+                <div class="invalid-feedback">
+                    {% if errors.title %}
+                    {{ errors.title }}
+                    {% else %}
+                    Пожалуйста, введите заголовок.
+                    {% endif %}
                 </div>
             </div>
-        </div>
+
+            <div class="form-group">
+                <label for="description">Описание:</label>
+                <textarea class="form-control {% if errors.description %}is-invalid{% endif %}" id="description" name="description" rows="3" required></textarea>
+                <div class="invalid-feedback">
+                    {% if errors.description %}
+                    {{ errors.description }}
+                    {% else %}
+                    Пожалуйста, введите описание.
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="status">Статус:</label>
+                <select class="form-control" id="status" name="status">
+                    <option value="новая">Новая</option>
+                    <option value="в процессе">В процессе</option>
+                    <option value="завершена">Завершена</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="priority">Приоритет:</label>
+                <select class="form-control" id="priority" name="priority">
+                    <option value="низкий">Низкий</option>
+                    <option value="средний">Средний</option>
+                    <option value="высокий">Высокий</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="deadline">Дедлайн:</label>
+                <input type="datetime-local" class="form-control" id="deadline" name="deadline">
+            </div>
+
+            <div class="form-group justify-content-center">
+                <button type="submit" class="btn btn-success me-3">Создать задачу</button>
+                <a href="/tasks" class="btn btn-secondary">Отмена</a>
+            </div>
+        </form>
     </div>
     {% endif %}
-
-<script src="{{ url_for('static', path='/scripts.js') }}"></script>
+</div>
 {% endblock %}
