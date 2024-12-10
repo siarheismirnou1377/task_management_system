@@ -95,10 +95,16 @@ async def register(request: Request, db: Session = Depends(get_db)):
     return RedirectResponse(url="/login", status_code=status.HTTP_302_FOUND)
 
 @app.get("/update_password", response_class=HTMLResponse)
-async def update_password_page(request: Request, current_user: models.User = Depends(get_current_user)):
+async def update_password_page(request: Request, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
     if not current_user:
         raise HTTPException(status_code=401, detail="Not authenticated")
-    return templates.TemplateResponse("update_password.html", {"request": request, "current_user": current_user, "error": None})
+    near_deadline_tasks = crud.get_tasks_with_near_deadline(db, user_id=current_user.id)
+    return templates.TemplateResponse("update_password.html", {
+        "request": request,
+        "current_user": current_user,
+        "near_deadline_tasks": near_deadline_tasks,
+        "errors": {}  # Передаём пустой словарь, чтобы избежать ошибки
+    })
 
 @app.post("/update_password", response_class=HTMLResponse)
 async def update_password(request: Request, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
@@ -109,7 +115,6 @@ async def update_password(request: Request, current_user: models.User = Depends(
     old_password = form.get("old_password")
     new_password = form.get("new_password")
     confirm_password = form.get("confirm_password")
-
     errors = {}  # Словарь для хранения ошибок
 
     # Проверка старого пароля
