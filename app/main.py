@@ -94,6 +94,45 @@ async def register(request: Request, db: Session = Depends(get_db)):
     db_user = crud.create_user(db, user, hashed_password)
     return RedirectResponse(url="/login", status_code=status.HTTP_302_FOUND)
 
+@app.get("/update_password", response_class=HTMLResponse)
+async def update_password_page(request: Request, current_user: models.User = Depends(get_current_user)):
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    return templates.TemplateResponse("update_password.html", {"request": request, "current_user": current_user, "error": None})
+
+@app.post("/update_password", response_class=HTMLResponse)
+async def update_password(request: Request, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    form = await request.form()
+    old_password = form.get("old_password")
+    new_password = form.get("new_password")
+    confirm_password = form.get("confirm_password")
+
+    errors = {}  # Словарь для хранения ошибок
+
+    # Проверка старого пароля
+    if not verify_password(old_password, current_user.hashed_password):
+        errors["old_password"] = "Неверный старый пароль"
+    
+    # Проверка совпадения нового пароля и подтверждения пароля
+    if new_password != confirm_password:
+        errors["confirm_password"] = "Новый пароль и подтверждение не совпадают"
+    
+    # Если есть ошибки, возвращаем форму с сообщениями об ошибках
+    if errors:
+        return templates.TemplateResponse("update_password.html", {"request": request, "current_user": current_user, "errors": errors})
+    
+    # Хеширование нового пароля
+    hashed_password = get_password_hash(new_password)
+    
+    # Обновление пароля в базе данных
+    crud.update_user_password(db, current_user.id, hashed_password)
+    
+    # Перенаправление на главную страницу
+    return RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
+
 @app.get("/search", response_class=HTMLResponse)
 async def search_tasks_page(request: Request, query: str = Query(None), current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
     if not current_user:
