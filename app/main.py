@@ -1,42 +1,26 @@
 from datetime import datetime
 import re
-from fastapi import Cookie, FastAPI, Request, Depends, HTTPException, status, Query
+from fastapi import FastAPI, Request, Depends, HTTPException, status, Query
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 from . import crud, models, schemas
-from .database import SessionLocal, engine
+from .database import engine
 from .auth import verify_password, get_password_hash
+from .api import api_router
+from app.dependencies import get_current_user, get_db
 
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
+app.include_router(api_router, prefix="/api", tags=["tasks"])
+
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 
 templates = Jinja2Templates(directory="app/templates")
-
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-def get_current_user(session_token: str = Cookie(None), db: Session = Depends(get_db)) -> models.User:
-    if session_token is None:
-        return None
-        # raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
-
-    session = crud.get_session(db, session_token)
-    if session is None or session.expires_at < datetime.utcnow():
-        return None
-        # raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Session expired")
-
-    return session.user
 
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
