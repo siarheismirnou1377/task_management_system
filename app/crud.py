@@ -1,9 +1,11 @@
 from datetime import datetime, timedelta, timezone
 import secrets
-from sqlalchemy.orm import Session
-from . import models, schemas
 from typing import List, Optional, Tuple
+
+from sqlalchemy.orm import Session
 from Levenshtein import distance as levenshtein_distance
+
+from . import models, schemas
 
 def get_user(db: Session, user_id: int) -> Optional[models.User]:
     return db.query(models.User).filter(models.User.id == user_id).first()

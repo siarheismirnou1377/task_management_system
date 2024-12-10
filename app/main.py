@@ -1,15 +1,18 @@
 import re
+from typing import Optional, List, Dict
+
 from fastapi import FastAPI, Request, Depends, HTTPException, status, Query
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
+
 from . import crud, models, schemas
 from .database import engine
 from .auth import verify_password, get_password_hash
 from .api import api_router
-from app.dependencies import get_current_user, get_db
-from typing import Optional, List, Dict
+from .dependencies import get_current_user, get_db
+
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -22,7 +25,11 @@ app.mount("/static", StaticFiles(directory="app/static"), name="static")
 templates = Jinja2Templates(directory="app/templates")
 
 @app.get("/", response_class=HTMLResponse)
-async def read_root(request: Request, db: Session = Depends(get_db), current_user: Optional[models.User] = Depends(get_current_user)) -> HTMLResponse:
+async def read_root(
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: Optional[models.User] = Depends(get_current_user)
+    ) -> HTMLResponse:
     errors: Dict[str, str] = {}
 
     if not current_user:
@@ -87,14 +94,17 @@ async def register(request: Request, db: Session = Depends(get_db)) -> HTMLRespo
     existing_user: Optional[models.User] = crud.get_user_by_username(db, username=username)
     if existing_user:
         errors["username"] = "Имя пользователя уже занято"
-    
+
     if len(username) < 4:
         errors["username"] = "Имя пользователя не может быть менее чем 4 символа"
 
     if not username:
         errors["username"] = "Имя пользователя не может быть пустым"
     if not re.match(r"^[a-zA-Z0-9_-]{1,8}$", username):
-        errors["username"] = "Логин должен содержать только буквы, цифры, дефисы и подчеркивания, не более 8 символов"
+        errors["username"] = (
+            "Логин должен содержать только буквы,"
+            "цифры, дефисы и подчеркивания, не более 8 символов"
+            )
 
     if not password:
         errors["password"] = "Пароль не может быть пустым"
@@ -111,7 +121,11 @@ async def register(request: Request, db: Session = Depends(get_db)) -> HTMLRespo
     return RedirectResponse(url="/login", status_code=status.HTTP_302_FOUND)
 
 @app.get("/update_password", response_class=HTMLResponse)
-async def update_password_page(request: Request, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)) -> HTMLResponse:
+async def update_password_page(
+    request: Request,
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+    ) -> HTMLResponse:
     if not current_user:
         raise HTTPException(status_code=401, detail="Not authenticated")
     near_deadline_tasks: List[Dict[str, str]] = crud.get_tasks_with_near_deadline(db, user_id=current_user.id)
@@ -123,10 +137,14 @@ async def update_password_page(request: Request, current_user: models.User = Dep
     })
 
 @app.post("/update_password", response_class=HTMLResponse)
-async def update_password(request: Request, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)) -> HTMLResponse:
+async def update_password(
+    request: Request,
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+    ) -> HTMLResponse:
     if not current_user:
         raise HTTPException(status_code=401, detail="Not authenticated")
-    
+
     form = await request.form()
     old_password: str = form.get("old_password")
     new_password: str = form.get("new_password")
@@ -135,12 +153,15 @@ async def update_password(request: Request, current_user: models.User = Depends(
 
     if not verify_password(old_password, current_user.hashed_password):
         errors["old_password"] = "Неверный старый пароль"
-    
+
     if new_password != confirm_password:
         errors["confirm_password"] = "Новый пароль и подтверждение не совпадают"
-    
+
     if errors:
-        return templates.TemplateResponse("update_password.html", {"request": request, "current_user": current_user, "errors": errors})
+        return templates.TemplateResponse(
+            "update_password.html",
+            {"request": request, "current_user": current_user, "errors": errors}
+        )
 
     hashed_password: str = get_password_hash(new_password)
     
@@ -149,7 +170,12 @@ async def update_password(request: Request, current_user: models.User = Depends(
     return RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
 
 @app.get("/search", response_class=HTMLResponse)
-async def search_tasks_page(request: Request, query: Optional[str] = Query(None), current_user: Optional[models.User] = Depends(get_current_user), db: Session = Depends(get_db)) -> HTMLResponse:
+async def search_tasks_page(
+    request: Request,
+    query: Optional[str] = Query(None),
+    current_user: Optional[models.User] = Depends(get_current_user),
+    db: Session = Depends(get_db)
+    ) -> HTMLResponse:
     errors: Dict[str, str] = {}
 
     if not current_user:
@@ -180,7 +206,11 @@ async def search_tasks_page(request: Request, query: Optional[str] = Query(None)
     })
 
 @app.get("/tasks", response_class=HTMLResponse)
-async def tasks_page(request: Request, current_user: Optional[models.User] = Depends(get_current_user), db: Session = Depends(get_db)) -> HTMLResponse:
+async def tasks_page(
+    request: Request,
+    current_user: Optional[models.User] = Depends(get_current_user),
+    db: Session = Depends(get_db)
+    ) -> HTMLResponse:
     if not current_user:
         return templates.TemplateResponse("tasks.html", {"request": request, "current_user": current_user})
     else:
@@ -188,10 +218,21 @@ async def tasks_page(request: Request, current_user: Optional[models.User] = Dep
 
         tasks.sort(key=lambda task: {"низкий": 3, "средний": 2, "высокий": 1}[task.priority])
         near_deadline_tasks: List[Dict[str, str]] = crud.get_tasks_with_near_deadline(db, user_id=current_user.id)
-        return templates.TemplateResponse("tasks.html", {"request": request, "tasks": tasks, "current_user": current_user, "near_deadline_tasks": near_deadline_tasks})
+        return templates.TemplateResponse(
+            "tasks.html", {
+                "request": request,
+                "tasks": tasks,
+                "current_user": current_user,
+                "near_deadline_tasks": near_deadline_tasks
+            }
+        )
 
 @app.get("/tasks/create", response_class=HTMLResponse)
-async def create_task_page(request: Request, db: Session = Depends(get_db), current_user: Optional[models.User] = Depends(get_current_user)) -> HTMLResponse:
+async def create_task_page(
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: Optional[models.User] = Depends(get_current_user)
+    ) -> HTMLResponse:
     near_deadline_tasks: List[Dict[str, str]] = crud.get_tasks_with_near_deadline(db, user_id=current_user.id)
     return templates.TemplateResponse("create_task.html", {
         "request": request,
@@ -201,7 +242,11 @@ async def create_task_page(request: Request, db: Session = Depends(get_db), curr
     })
 
 @app.post("/tasks/create", response_class=HTMLResponse)
-async def create_task(request: Request, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)) -> HTMLResponse:
+async def create_task(
+    request: Request,
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+    ) -> HTMLResponse:
     form = await request.form()
     errors: Dict[str, str] = {}
 
@@ -235,7 +280,12 @@ async def create_task(request: Request, current_user: models.User = Depends(get_
     return RedirectResponse(url="/tasks", status_code=status.HTTP_302_FOUND)
 
 @app.get("/tasks/{task_id}/edit", response_class=HTMLResponse)
-async def edit_task_page(request: Request, task_id: int, db: Session = Depends(get_db), current_user: Optional[models.User] = Depends(get_current_user)) -> HTMLResponse:
+async def edit_task_page(
+    request: Request,
+    task_id: int,
+    db: Session = Depends(get_db),
+    current_user: Optional[models.User] = Depends(get_current_user)
+    ) -> HTMLResponse:
     task: Optional[models.Task] = crud.get_task(db, task_id=task_id)
     near_deadline_tasks: List[Dict[str, str]] = crud.get_tasks_with_near_deadline(db, user_id=current_user.id)
     if task is None:
@@ -249,7 +299,12 @@ async def edit_task_page(request: Request, task_id: int, db: Session = Depends(g
     })
 
 @app.post("/tasks/{task_id}/edit", response_class=HTMLResponse)
-async def edit_task(request: Request, task_id: int, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)) -> HTMLResponse:
+async def edit_task(
+    request: Request,
+    task_id: int,
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+    ) -> HTMLResponse:
     form = await request.form()
     errors: Dict[str, str] = {}
 
@@ -287,7 +342,12 @@ async def edit_task(request: Request, task_id: int, current_user: models.User = 
     return RedirectResponse(url="/tasks", status_code=status.HTTP_302_FOUND)
 
 @app.post("/tasks/{task_id}/delete", response_class=HTMLResponse)
-async def delete_task(request: Request, task_id: int, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)) -> HTMLResponse:
+async def delete_task(
+    request: Request,
+    task_id: int,
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+    ) -> HTMLResponse:
     errors: Dict[str, str] = {}
 
     existing_task: Optional[models.Task] = crud.get_task(db, task_id)

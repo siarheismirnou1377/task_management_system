@@ -1,9 +1,7 @@
-from sqlalchemy import Integer, String, DateTime, Enum, ForeignKey
-from sqlalchemy.orm import relationship
-from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import mapped_column
-from sqlalchemy.orm import DeclarativeBase
 from typing import List, Optional
+
+from sqlalchemy import Integer, String, DateTime, Enum, ForeignKey
+from sqlalchemy.orm import relationship, Mapped, mapped_column, DeclarativeBase
 
 
 class Base(DeclarativeBase):
@@ -25,8 +23,14 @@ class Task(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     title: Mapped[str] = mapped_column(String, index=True)
     description: Mapped[str] = mapped_column(String, index=True)
-    status: Mapped[str] = mapped_column(Enum("новая", "в процессе", "завершена", name="status_enum"), default="новая")
-    priority: Mapped[str] = mapped_column(Enum("низкий", "средний", "высокий", name="priority_enum"), default="средний")
+    status: Mapped[str] = mapped_column(
+        Enum("новая", "в процессе", "завершена", name="status_enum"),
+        default="новая"
+    )
+    priority: Mapped[str] = mapped_column(
+        Enum("низкий", "средний", "высокий", name="priority_enum"),
+        default="средний"
+    )
     deadline: Mapped[Optional[DateTime]] = mapped_column(DateTime, nullable=True)
     owner_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
 

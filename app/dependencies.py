@@ -1,9 +1,12 @@
 from datetime import datetime
+from typing import Generator, Optional
+
 from fastapi import Depends, Cookie
 from sqlalchemy.orm import Session
+
 from . import crud, models
 from .database import SessionLocal
-from typing import Generator, Optional
+
 
 def get_db() -> Generator[Session, None, None]:
     db = SessionLocal()

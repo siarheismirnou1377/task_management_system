@@ -1,4 +1,5 @@
 from datetime import datetime
+
 from fastapi import APIRouter, Depends, HTTPException, status, Cookie
 from sqlalchemy.orm import Session
 
@@ -32,7 +33,7 @@ async def update_task(task_id: int, task: schemas.TaskCreate, current_user: mode
     existing_task: models.Task | None = crud.get_task(db, task_id)
     if existing_task is None or existing_task.owner_id != current_user.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Permission denied")
-    
+
     updated_task: models.Task = crud.update_task(db, task_id, task)
     return updated_task
 
@@ -41,6 +42,6 @@ async def delete_task(task_id: int, current_user: models.User = Depends(get_curr
     existing_task: models.Task | None = crud.get_task(db, task_id)
     if existing_task is None or existing_task.owner_id != current_user.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Permission denied")
-    
+
     crud.delete_task(db, task_id)
     return {"message": "Task deleted successfully"}
