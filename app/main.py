@@ -103,7 +103,7 @@ async def update_password_page(request: Request, current_user: models.User = Dep
         "request": request,
         "current_user": current_user,
         "near_deadline_tasks": near_deadline_tasks,
-        "errors": {}  # Передаём пустой словарь, чтобы избежать ошибки
+        "errors": {}
     })
 
 @app.post("/update_password", response_class=HTMLResponse)
@@ -115,27 +115,21 @@ async def update_password(request: Request, current_user: models.User = Depends(
     old_password = form.get("old_password")
     new_password = form.get("new_password")
     confirm_password = form.get("confirm_password")
-    errors = {}  # Словарь для хранения ошибок
+    errors = {}
 
-    # Проверка старого пароля
     if not verify_password(old_password, current_user.hashed_password):
         errors["old_password"] = "Неверный старый пароль"
     
-    # Проверка совпадения нового пароля и подтверждения пароля
     if new_password != confirm_password:
         errors["confirm_password"] = "Новый пароль и подтверждение не совпадают"
     
-    # Если есть ошибки, возвращаем форму с сообщениями об ошибках
     if errors:
         return templates.TemplateResponse("update_password.html", {"request": request, "current_user": current_user, "errors": errors})
-    
-    # Хеширование нового пароля
+
     hashed_password = get_password_hash(new_password)
     
-    # Обновление пароля в базе данных
     crud.update_user_password(db, current_user.id, hashed_password)
     
-    # Перенаправление на главную страницу
     return RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
 
 @app.get("/search", response_class=HTMLResponse)
@@ -156,7 +150,7 @@ async def tasks_page(request: Request, current_user: models.User = Depends(get_c
         return templates.TemplateResponse("tasks.html", {"request": request, "current_user": current_user})
     else:
         tasks = crud.get_tasks(db, user_id=current_user.id)
-        # Сортировка задач по приоритету
+
         tasks.sort(key=lambda task: {"низкий": 3, "средний": 2, "высокий": 1}[task.priority])
         near_deadline_tasks = crud.get_tasks_with_near_deadline(db, user_id=current_user.id)
         return templates.TemplateResponse("tasks.html", {"request": request, "tasks": tasks, "current_user": current_user, "near_deadline_tasks": near_deadline_tasks})

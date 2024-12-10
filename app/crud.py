@@ -44,7 +44,6 @@ def update_task(db: Session, task_id: int, task: schemas.TaskCreate):
     if db_task is None:
         return None  # Или вы можете выбросить исключение, если задача не найдена
 
-    # Обновляем поля задачи
     db_task.title = task.title
     db_task.description = task.description
     db_task.status = task.status
@@ -63,7 +62,7 @@ def delete_task(db: Session, task_id: int):
 
 def create_session(db: Session, user_id: int) -> models.Session:
     session_token = secrets.token_hex(32)
-    expires_at = datetime.now(timezone.utc) + timedelta(days=7)  # Сессия действительна 7 дней
+    expires_at = datetime.now(timezone.utc) + timedelta(days=7)
     db_session = models.Session(user_id=user_id, session_token=session_token, expires_at=expires_at)
     db.add(db_session)
     db.commit()

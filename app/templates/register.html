@@ -7,26 +7,22 @@
     <div class="col-md-6">
         <h2 class="text-center mb-4">Регистрация</h2>
         <form action="/register" method="post" class="needs-validation" novalidate>
-            <!-- Имя пользователя -->
             <div class="form-group">
                 <label for="username">Имя пользователя:</label>
                 <input type="text" class="form-control" id="username" name="username" required>
                 <div class="invalid-feedback">Пожалуйста, введите имя пользователя.</div>
             </div>
 
-            <!-- Пароль -->
             <div class="form-group">
                 <label for="password">Пароль:</label>
                 <input type="password" class="form-control" id="password" name="password" required>
                 <div class="invalid-feedback">Пожалуйста, введите пароль.</div>
             </div>
 
-            <!-- Кнопка регистрации -->
             <div class="form-group d-flex justify-content-center mt-3">
                 <button type="submit" class="btn btn-primary w-100">Зарегистрироваться</button>
             </div>
 
-            <!-- Ссылка на вход -->
             <div class="text-center mt-3">
                 <p>Уже есть аккаунт? <a href="/login">Войдите</a></p>
             </div>
