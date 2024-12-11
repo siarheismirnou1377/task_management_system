@@ -78,7 +78,7 @@ task_management_system/
    ```bash
    sudo docker-compose --env-file app/configs/config.env up --build
    ```
-   -чтобы перезапустить контейнер если вы его завершли, можете спользовать команду:
+   -чтобы перезапустить контейнер если вы его завершили, можете спользовать команду:
    ```bash
    sudo docker-compose --env-file app/configs/config.env up -d
    ```
