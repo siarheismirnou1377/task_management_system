@@ -55,7 +55,7 @@ app/
 
    ```bash
    git clone https://github.com/siarheismirnou1377/task_management_system.git
-   cd app
+   cd task_management_system
    ```
 
 2. **Настройте переменные окружения:**
