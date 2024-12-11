@@ -33,7 +33,7 @@
                         <p>{{ task.description|truncate(17, True, '...') }}</p>
                         <p class="status-{{ task.status }}">Статус: {{ task.status }}</p>
                         <p class="priority-{{ task.priority }}">Приоритет: {{ task.priority }}</p>
-                        <p>Дедлайн: {{ task.deadline }}</p>
+                        <p>Дедлайн: {% if task.deadline %}{{ task.deadline }}{% else %}Нет{% endif %}</p>
                         <a href="/tasks/{{ task.id }}/edit" class="btn btn-primary">Редактировать</a>
                         <form action="/tasks/{{ task.id }}/delete" method="post" style="display:inline;">
                             <button type="submit" class="btn btn-danger">Удалить</button>
@@ -52,7 +52,7 @@
                             <p>{{ task.description|truncate(17, True, '...') }}</p>
                             <p class="status-{{ task.status }}">Статус: {{ task.status }}</p>
                             <p class="priority-{{ task.priority }}">Приоритет: {{ task.priority }}</p>
-                            <p>Дедлайн: {{ task.deadline }}</p>
+                            <p>Дедлайн: {% if task.deadline %}{{ task.deadline }}{% else %}Нет{% endif %}</p>
                             <a href="/tasks/{{ task.id }}/edit" class="btn btn-primary">Редактировать</a>
                             <form action="/tasks/{{ task.id }}/delete" method="post" style="display:inline;">
                                 <button type="submit" class="btn btn-danger">Удалить</button>
@@ -71,7 +71,7 @@
                         <p>{{ task.description|truncate(17, True, '...') }}</p>
                         <p class="status-{{ task.status }}">Статус: {{ task.status }}</p>
                         <p class="priority-{{ task.priority }}">Приоритет: {{ task.priority }}</p>
-                        <p>Дедлайн: {{ task.deadline }}</p>
+                        <p>Дедлайн: {% if task.deadline %}{{ task.deadline }}{% else %}Нет{% endif %}</p>
                         <a href="/tasks/{{ task.id }}/edit" class="btn btn-primary">Редактировать</a>
                         <form action="/tasks/{{ task.id }}/delete" method="post" style="display:inline;">
                             <button type="submit" class="btn btn-danger">Удалить</button>

@@ -30,7 +30,7 @@
                     <p class="card-text"><strong>Описание:</strong> {{ task.description }}</p>
                     <p class="card-text"><strong>Статус:</strong> {{ task.status }}</p>
                     <p class="card-text"><strong>Приоритет:</strong> {{ task.priority }}</p>
-                    <p class="card-text"><strong>Дедлайн:</strong> {{ task.deadline }}</p>
+                    <p class="card-text"><strong>Дедлайн:</strong>{% if task.deadline %}{{ task.deadline }}{% else %}Нет{% endif %}</p>
                 </div>
             </div>
     

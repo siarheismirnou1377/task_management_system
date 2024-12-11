@@ -272,7 +272,7 @@ async def update_password(
             "update_password.html",
             {"request": request, "current_user": current_user, "errors": errors}
         )
-
+    
     hashed_password: str = get_password_hash(new_password)
     crud.update_user_password(db, current_user.id, hashed_password)
 
@@ -519,12 +519,17 @@ async def edit_task(
             "errors": errors
         })
 
+    # Проверка на пустое значение deadline
+    deadline = form.get("deadline")
+    if deadline == "":
+        deadline = None
+
     task: schemas.TaskCreate = schemas.TaskCreate(
         title=form.get("title"),
         description=form.get("description"),
         status=form.get("status"),
         priority=form.get("priority"),
-        deadline=form.get("deadline")
+        deadline=deadline
     )
     crud.update_task(db, task_id, task)
     return RedirectResponse(url="/tasks", status_code=status.HTTP_302_FOUND)
