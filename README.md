@@ -7,34 +7,33 @@
 Проект организован следующим образом:
 
 ```
-task_management_system/
-│
-├── app/
-│   ├── configs/
-│   │   ├── config.env
-│   │   └── configs.py
-│   ├── static/
-│   │   ├── scripts.js
-│   │   └── styles.css
-│   ├── templates/
-│   │   ├── base.html
-│   │   ├── create_task.html
-│   │   ├── edit_task.html
-│   │   ├── index.html
-│   │   ├── login.html
-│   │   ├── register.html
-│   │   ├── search.html
-│   │   ├── task.html
-│   │   └── tasks.html
-│   ├── __init__.py
-│   ├── api.py
-│   ├── auth.py
-│   ├── crud.py
-│   ├── database.py
-│   ├── dependencies.py
-│   ├── main.py
-│   ├── models.py
-│   └── schemas.py
+
+app/
+│  ├── configs/
+│  │   ├── config.env
+│  │   └── configs.py
+│  ├── static/
+│  │   ├── scripts.js
+│  │   └── styles.css
+│  ├── templates/
+│  │   ├── base.html
+│  │   ├── create_task.html
+│  │   ├── edit_task.html
+│  │   ├── index.html
+│  │   ├── login.html
+│  │   ├── register.html
+│  │   ├── search.html
+│  │   ├── task.html
+│  │   └── tasks.html
+│  ├── __init__.py
+│  ├── api.py
+│  ├── auth.py
+│  ├── crud.py
+│  ├── database.py
+│  ├── dependencies.py
+│  ├── main.py
+│  ├── models.py
+│  └── schemas.py
 │
 ├── .gitignore
 ├── docker-compose.yml
@@ -55,7 +54,7 @@ task_management_system/
 1. **Клонируйте репозиторий:**
 
    ```bash
-   git clone https://github.com/your-repo/task_management_system.git
+   git clone https://github.com/siarheismirnou1377/task_management_system.git
    cd task_management_system
    ```
 
