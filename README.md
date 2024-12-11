@@ -5,35 +5,35 @@
 ## Структура проекта
 
 Проект организован следующим образом:
-
 ```
-
-app/
-│  ├── configs/
-│  │   ├── config.env
-│  │   └── configs.py
-│  ├── static/
-│  │   ├── scripts.js
-│  │   └── styles.css
-│  ├── templates/
-│  │   ├── base.html
-│  │   ├── create_task.html
-│  │   ├── edit_task.html
-│  │   ├── index.html
-│  │   ├── login.html
-│  │   ├── register.html
-│  │   ├── search.html
-│  │   ├── task.html
-│  │   └── tasks.html
-│  ├── __init__.py
-│  ├── api.py
-│  ├── auth.py
-│  ├── crud.py
-│  ├── database.py
-│  ├── dependencies.py
-│  ├── main.py
-│  ├── models.py
-│  └── schemas.py
+task_management_system/
+│
+├── app/
+│   ├── configs/
+│   │   ├── config.env
+│   │   └── configs.py
+│   ├── static/
+│   │   ├── scripts.js
+│   │   └── styles.css
+│   ├── templates/
+│   │   ├── base.html
+│   │   ├── create_task.html
+│   │   ├── edit_task.html
+│   │   ├── index.html
+│   │   ├── login.html
+│   │   ├── register.html
+│   │   ├── search.html
+│   │   ├── task.html
+│   │   └── tasks.html
+│   ├── __init__.py
+│   ├── api.py
+│   ├── auth.py
+│   ├── crud.py
+│   ├── database.py
+│   ├── dependencies.py
+│   ├── main.py
+│   ├── models.py
+│   └── schemas.py
 │
 ├── .gitignore
 ├── docker-compose.yml
@@ -41,7 +41,6 @@ app/
 ├── README.md
 └── requirements.txt
 ```
-
 ## Установка и запуск
 
 ### Предварительные требования
@@ -79,7 +78,10 @@ app/
    ```bash
    sudo docker-compose --env-file app/configs/config.env up --build
    ```
-
+   -чтобы перезапустить контейнер если вы его завершили, можете спользовать команду:
+   ```bash
+   sudo docker-compose --env-file app/configs/config.env up -d
+   ```
 4. **Доступ к приложению:**
 
    После успешного запуска, приложение будет доступно по адресу:
