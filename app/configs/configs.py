@@ -6,12 +6,18 @@ from dotenv import load_dotenv
 load_dotenv(os.path.join(os.path.dirname(__file__), '.', 'config.env'))
 
 
-LOGIN: str = os.getenv('LOGIN')
+# Переменные окружения для приложения
+APP_HOST: str = os.getenv('APP_HOST')
+APP_PORT: int = int(os.getenv('APP_PORT'))
 
-PASSWORD: str = os.getenv('PASSWORD')
+
+# Переменные окружения для базы данных
+DB_LOGIN: str = os.getenv('DB_LOGIN')
+
+DB_PASSWORD: str = os.getenv('DB_PASSWORD')
 
 DB_NAME: str = os.getenv('DB_NAME')
 
-HOST: str = os.getenv('HOST')
+DB_HOST: str = os.getenv('DB_HOST')
 
-PORT: int = os.getenv('PORT')
+DB_PORT: int = os.getenv('DB_PORT')
